@@ -5,6 +5,7 @@
 [![Claude Code Hook](https://img.shields.io/badge/Claude_Code-Hook-6272F5)](https://code.claude.com/docs/en/hooks-reference)
 [![Codex Hook](https://img.shields.io/badge/Codex-Hook-10A37F)](#-2-min-quickstart)
 [![Terraform | OpenTofu | CDK](https://img.shields.io/badge/Terraform_|_OpenTofu_|_CDK-supported-844FBA)](#-what-it-catches)
+[![npm](https://img.shields.io/npm/v/plansentry.svg)](https://www.npmjs.com/package/plansentry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
@@ -37,11 +38,10 @@ ask you to run it yourself.
 
 ## ⚡ 2 min Quickstart
 
-Requires Node.js 20+. Not on npm yet, so install from source:
+Requires Node.js 20+.
 
 ```bash
-git clone https://github.com/RobeyBeswick/plansentry.git && cd plansentry
-npm install && npm run build && npm link
+npm install -g plansentry
 ```
 
 Then hook it into your agent:

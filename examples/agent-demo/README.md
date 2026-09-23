@@ -10,7 +10,7 @@ account is needed and nothing real is touched.
 ## Setup
 
 Needs `terraform`, [`uv`](https://docs.astral.sh/uv/), and `plansentry` on your PATH
-(`npm install && npm run build && npm link` in the repo root).
+(`npm install -g plansentry`).
 
 ```bash
 ./demo.sh up        # starts the mock, creates /tmp/shop-infra, deploys 25 orders + 3 invoices, installs the hook

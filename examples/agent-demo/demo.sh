@@ -69,7 +69,7 @@ case "${1:-}" in
   up)
     need uvx "https://docs.astral.sh/uv/"
     need terraform "https://developer.hashicorp.com/terraform/install"
-    need plansentry "run 'npm install && npm run build && npm link' in the plansentry repo"
+    need plansentry "npm install -g plansentry"
     mock_up
     rm -rf "$DEMO_DIR" && mkdir -p "$DEMO_DIR"
     cd "$DEMO_DIR"
