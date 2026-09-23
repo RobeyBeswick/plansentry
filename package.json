@@ -1,0 +1,46 @@
+{
+  "name": "plansentry",
+  "version": "0.1.0",
+  "description": "Plan-aware guardrail for AI coding agents: blocks terraform apply / cdk deploy runs that would delete or replace your databases, buckets and keys.",
+  "type": "module",
+  "bin": {
+    "plansentry": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "gen:stateful": "node scripts/gen-cfn-stateful.mjs",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "keywords": [
+    "terraform",
+    "opentofu",
+    "aws-cdk",
+    "cloudformation",
+    "claude-code",
+    "codex",
+    "ai-agents",
+    "guardrails",
+    "hooks",
+    "iac"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@aws-cdk/cloudformation-diff": "^2.187.5"
+  },
+  "devDependencies": {
+    "@aws-cdk/aws-service-spec": "^0.1.214",
+    "@types/node": "^22.20.4",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
