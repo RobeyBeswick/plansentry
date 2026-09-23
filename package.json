@@ -2,6 +2,15 @@
   "name": "plansentry",
   "version": "0.1.0",
   "description": "Plan-aware guardrail for AI coding agents: blocks terraform apply / cdk deploy runs that would delete or replace your databases, buckets and keys.",
+  "author": "Robey Beswick",
+  "homepage": "https://github.com/RobeyBeswick/plansentry#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobeyBeswick/plansentry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RobeyBeswick/plansentry/issues"
+  },
   "type": "module",
   "bin": {
     "plansentry": "dist/cli.js"
