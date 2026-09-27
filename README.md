@@ -134,7 +134,9 @@ real isolation, also give the agent least-privilege credentials and turn on dele
 **Q: What doesn't it cover yet?**
 
 Terragrunt plans aren't analysed yet (terragrunt applies always ask you). Nested CloudFormation stacks
-get a warning, not a full diff. Commands built at runtime (`eval "$CMD"`) can't be seen.
+aren't diffed, so any change to one asks you (add it to `ignore` to skip that). Commands built at
+runtime (`eval "$CMD"`) can't be seen, and neither can applies behind less common shell constructs
+(shell functions, loops over subcommands, `xargs`, `find -exec`).
 
 **Q: How do I see what the hook would do?**
 
