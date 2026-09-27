@@ -74,7 +74,14 @@ export function hookMain(agent: Agent): number {
   } catch {
     return 0;
   }
-  const res = runHook(raw, agent);
+  let res: HookResult;
+  try {
+    res = runHook(raw, agent);
+  } catch (e) {
+    // A crashed hook doesn't block the tool call, so turn our bug into a deny for anything IaC-looking.
+    if (!/\b(terraform|tofu|terragrunt|cdk|cloudformation|plansentry)\b/.test(raw)) return 0;
+    res = formatDecision({ kind: 'deny', reason: `plansentry hook failed (${(e as Error).message}). Run the terraform/cdk command on its own.` }, agent);
+  }
   if (res.stdout) process.stdout.write(res.stdout);
   if (res.stderr) process.stderr.write(res.stderr);
   return res.exitCode;

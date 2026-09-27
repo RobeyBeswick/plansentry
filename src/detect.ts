@@ -65,6 +65,10 @@ export interface DetectOptions {
 
 const MAX_DEPTH = 5;
 const MAX_FILE_BYTES = 512 * 1024;
+/** Well under the hook timeout: a hook that times out lets the command run unchecked. */
+const TIME_BUDGET_MS = 10_000;
+let deadline = Infinity;
+let outOfTime = false;
 
 const GUARDED_TEXT = [
   /\b(terraform|tofu|terragrunt)\b[^\n;|&]*\b(apply|destroy)\b/,
@@ -97,7 +101,13 @@ const PM_BUILTINS = new Set([
 
 export function detect(command: string, opts: DetectOptions): Operation[] {
   const ops: Operation[] = [];
-  walk(command, opts.cwd, [], 0, opts.env ?? {}, ops, true);
+  deadline = Date.now() + TIME_BUDGET_MS;
+  outOfTime = false;
+  try {
+    walk(command, opts.cwd, [], 0, opts.env ?? {}, ops, true);
+  } finally {
+    deadline = Infinity;
+  }
   return ops;
 }
 
@@ -110,6 +120,12 @@ function walk(
   ops: Operation[],
   _topLevel: boolean,
 ): void {
+  if (Date.now() > deadline) {
+    // We can't tell what the rest would run; when in doubt, block (once).
+    if (!outOfTime) ops.push({ kind: 'opaque', reason: 'too many nested scripts to analyse in time', snippet: clip(text), via, cwd });
+    outOfTime = true;
+    return;
+  }
   if (depth > MAX_DEPTH) {
     if (MENTIONS_IAC.test(text)) ops.push({ kind: 'opaque', reason: 'nesting too deep to analyse', snippet: clip(text), via, cwd });
     return;
