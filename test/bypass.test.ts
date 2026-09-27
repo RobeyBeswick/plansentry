@@ -61,6 +61,8 @@ describe('passes ordinary and read-only commands', () => {
     './ok.sh',
     'plansentry exec -- terraform apply',
     'plansentry explain "terraform destroy"',
+    'bash -euo pipefail -c "terraform plan"',
+    'bash -o pipefail ok.sh',
   ])('%s', (cmd) => {
     expect(kind(cmd)).toBe('pass');
   });
@@ -95,6 +97,7 @@ describe('routes direct applies through plansentry exec', () => {
     ['cdk deploy --hotswap', 'plansentry exec -- cdk deploy --hotswap'],
     ['terraform plan && terraform apply', 'terraform plan && plansentry exec -- terraform apply'],
     ['if true; then terraform apply; fi', 'if true; then plansentry exec -- terraform apply; fi'],
+    ['time -p terraform apply', 'time -p plansentry exec -- terraform apply'],
   ])('%s', (cmd, rerun) => {
     const res = d(cmd);
     expect(res.kind).toBe('deny');
@@ -112,6 +115,11 @@ describe('denies indirection that hides an apply', () => {
     ['bash -c "terraform destroy -auto-approve"', 'bash -c'],
     ["sh -c 'cd infra && terraform apply'", 'sh -c'],
     ['bash -lc "npx cdk deploy"', 'via bash'],
+    ['bash -euo pipefail -c "terraform apply -auto-approve"', 'bash -c'],
+    ['bash -o pipefail -c "cdk deploy"', 'bash -c'],
+    ['bash -O extglob -c "terraform destroy -auto-approve"', 'bash -c'],
+    ['sh -c -- "terraform apply"', 'sh -c'],
+    ['bash -o pipefail deploy.sh', 'bash deploy.sh'],
     ['eval "terraform apply -auto-approve"', 'eval'],
     ['X=$(terraform apply -auto-approve)', 'command substitution'],
     ['echo `terraform destroy -auto-approve`', 'command substitution'],

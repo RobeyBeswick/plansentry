@@ -275,24 +275,38 @@ function handleShell(
   ops: Operation[],
 ): void {
   const program = basename(argv[0]!);
+  // With -c anywhere in the options, the first non-option word is the script (`bash -euo pipefail -c "..."`).
+  let withC = false;
   for (let i = 1; i < argv.length; i++) {
     const a = argv[i]!;
-    if (a === '-c' || /^-[a-z]*c[a-z]*$/.test(a)) {
-      const script = argv[i + 1];
-      if (script === undefined) return;
-      if (dynamic[i + 1]) {
+    if (a === '--') {
+      i++;
+    } else if (a === '--rcfile' || a === '--init-file') {
+      i++;
+      continue;
+    } else if (a.startsWith('--')) {
+      continue;
+    } else if (/^[-+][A-Za-z]+$/.test(a)) {
+      if (a.startsWith('-') && a.includes('c')) withC = true;
+      i += a.slice(1).replace(/[^oO]/g, '').length; // -o/-O take an option name
+      continue;
+    }
+    const word = argv[i];
+    if (word === undefined) break;
+    if (withC) {
+      if (dynamic[i]) {
         if (MENTIONS_IAC.test(cmdText) || MENTIONS_ACTION.test(cmdText)) {
           ops.push({ kind: 'opaque', reason: `\`${program} -c\` with a dynamic string`, snippet: clip(cmdText), via, cwd: dir });
         }
         return;
       }
-      walk(script, dir, [...via, `${program} -c`], depth + 1, env, ops, false);
+      walk(word, dir, [...via, `${program} -c`], depth + 1, env, ops, false);
       return;
     }
-    if (a.startsWith('-') || a.startsWith('+')) continue;
-    scanFile(resolve(dir, expandHome(a)), dir, [...via, `${program} ${a}`], depth, env, ops, true);
+    scanFile(resolve(dir, expandHome(word)), dir, [...via, `${program} ${word}`], depth, env, ops, true);
     return;
   }
+  if (withC) return;
   // No script argument: commands come from a heredoc/here-string or a pipe.
   const heredoc = cmd.redirects.find((r) => r.heredoc !== undefined)?.heredoc;
   if (heredoc !== undefined) {

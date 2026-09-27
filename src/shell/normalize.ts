@@ -197,6 +197,7 @@ export function normalize(cmd: SimpleCommand): NormalizedCommand {
     const w = words[i]!;
     if (LEADING_KEYWORDS.has(w.value)) {
       i++;
+      if (w.value === 'time' && words[i]?.value === '-p') i++; // POSIX output format
       continue;
     }
     if (ASSIGNMENT.test(w.value)) {
