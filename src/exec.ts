@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { runCdk } from './cdk/runner.js';
+import { terragruntChangesState } from './detect.js';
 import { EXIT_USAGE, isInteractive } from './gate.js';
 import { runGuardedCommand } from './guarded.js';
 import { ConfigError, loadConfig } from './policy/config.js';
@@ -86,7 +87,8 @@ export function execMain(args: string[]): number {
   if (program === 'cdk' || program === 'aws-cdk') return runCdk(n.argv, ctx);
   if (program === 'terragrunt') {
     const sub = n.argv.find((a, i) => i > 0 && !a.startsWith('-')) ?? '';
-    if (['apply', 'destroy', 'run-all', 'run'].includes(sub)) {
+    // Scan every argument, not just the first positional: `--terragrunt-working-dir infra apply`.
+    if (terragruntChangesState(n.argv.slice(1)) || ['run-all', 'run'].includes(sub)) {
       return runGuardedCommand('terragrunt plans are not analysed yet', [...n.prefix, ...n.argv], ctx);
     }
     const [cmd, ...rest] = [...n.prefix, ...n.argv];

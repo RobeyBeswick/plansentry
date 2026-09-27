@@ -36,4 +36,10 @@ describe.skipIf(!hasTerraform || !existsSync(CLI))('terraform end to end', () =>
 
     expect(run('exec', '--', 'terraform', 'apply', '-auto-approve').status).toBe(0);
   }, 180_000);
+
+  it('holds a terragrunt apply behind options for approval instead of running it', () => {
+    const res = run('exec', '--', 'terragrunt', '--terragrunt-working-dir', 'infra', 'apply', '-auto-approve');
+    expect(res.status).toBe(3);
+    expect(res.stdout + res.stderr).toContain('terragrunt plans are not analysed yet');
+  });
 });

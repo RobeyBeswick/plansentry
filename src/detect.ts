@@ -79,6 +79,11 @@ export function textLooksGuarded(text: string): boolean {
   return GUARDED_TEXT.some((re) => re.test(text));
 }
 
+/** Terragrunt arguments (after the program) that can change infrastructure: apply, destroy, apply-all, run --all apply, ... */
+export function terragruntChangesState(args: string[]): boolean {
+  return /\b(apply|destroy)\b/.test(args.join(' '));
+}
+
 const SHELLS = new Set(['bash', 'sh', 'zsh', 'dash', 'ksh', 'ash', 'fish']);
 const INTERPRETERS = new Set(['python', 'python3', 'node', 'ruby', 'perl', 'deno', 'tsx', 'ts-node', 'pwsh', 'powershell']);
 const JS_PMS = new Set(['npm', 'pnpm', 'yarn', 'bun']);
@@ -169,7 +174,7 @@ function walk(
 
     if (program === 'terragrunt') {
       const rest = n.argv.slice(1).join(' ');
-      if (/\b(apply|destroy)\b/.test(rest)) {
+      if (terragruntChangesState(n.argv.slice(1))) {
         ops.push({ kind: 'risky', description: `terragrunt ${rest} (terragrunt plans are not analysed yet)`, via: nestedVia, cwd: dir });
       }
       continue;

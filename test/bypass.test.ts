@@ -162,6 +162,7 @@ describe('asks a human for operations with no plan', () => {
     'terraform force-unlock 1234',
     'terraform workspace delete prod',
     'terragrunt run-all apply',
+    'terragrunt --terragrunt-working-dir infra apply',
     'cdk import',
     'cdk watch',
     'cdk gc',
