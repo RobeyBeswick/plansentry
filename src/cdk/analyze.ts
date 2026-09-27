@@ -124,7 +124,8 @@ export function analyzeCdkStack(input: StackDiffInput, config: Config): Analysis
       case ResourceImpact.WILL_UPDATE: {
         out.counts.update++;
         if (type === 'AWS::CloudFormation::Stack') {
-          push('warn', 'unknown', 'nested stack changes; its contents are not analysed', ['review the nested template diff with `cdk diff`']);
+          // Its contents could delete a database, and we can't see them: don't let it through unasked.
+          push('danger', 'unknown', 'nested stack changes; its contents are not analysed', ['review the nested template diff with `cdk diff`']);
         }
         if (stateful && RETAINED.has(oldRes?.DeletionPolicy ?? '') && !RETAINED.has(newRes?.DeletionPolicy ?? 'Delete')) {
           push('warn', 'weaken', `DeletionPolicy weakened from ${oldRes?.DeletionPolicy} to ${newRes?.DeletionPolicy ?? 'Delete'}`);

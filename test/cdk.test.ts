@@ -71,6 +71,15 @@ describe('analyzeCdkStack', () => {
     expect(a.counts.create).toBe(2);
   });
 
+  it('needs approval for a nested stack change, since its contents are not analysed', () => {
+    const nested = (url: string): Res => ({ Type: 'AWS::CloudFormation::Stack', Properties: { TemplateURL: url } });
+    const a = analyzeCdkStack({ stack: 'App', before: tpl({ Data: nested('https://x/v1.json') }), after: tpl({ Data: nested('https://x/v2.json') }) }, cfg());
+    expect(byAddress(a)['App/Data']).toMatchObject({ severity: 'danger', change: 'unknown' });
+    expect(evaluate(a, cfg()).needsApproval).toBe(true);
+    const ignored = analyzeCdkStack({ stack: 'App', before: tpl({ Data: nested('https://x/v1.json') }), after: tpl({ Data: nested('https://x/v2.json') }) }, cfg({ ignore: ['App/Data'] }));
+    expect(ignored.findings).toHaveLength(0);
+  });
+
   it('respects ignore globs on the Stack/LogicalId address', () => {
     const a = analyzeCdkStack({ stack: 'Scratch', before: tpl({ Orders: table('id') }), after: tpl({}) }, cfg({ ignore: ['Scratch/*'] }));
     expect(a.findings).toHaveLength(0);
