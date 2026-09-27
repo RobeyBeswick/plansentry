@@ -1,6 +1,6 @@
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { accessSync, constants, copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { delimiter, dirname, join } from 'node:path';
 
 export type InstallTarget = 'claude' | 'codex';
 
@@ -27,6 +27,25 @@ export function settingsPath(target: InstallTarget, project: boolean, cwd = proc
 function hookCommand(target: InstallTarget): string {
   return `plansentry hook --agent ${target}`;
 }
+
+/** Whether `name` resolves to an executable on `pathVar`, the way the agent's shell would find it. */
+export function onPath(name: string, pathVar = process.env.PATH ?? ''): boolean {
+  return pathVar.split(delimiter).some((d) => {
+    if (!d) return false;
+    const p = join(d, name);
+    try {
+      accessSync(p, constants.X_OK);
+      return statSync(p).isFile();
+    } catch {
+      return false;
+    }
+  });
+}
+
+// A hook whose command isn't found fails without blocking anything, so say so at install time.
+const NOT_ON_PATH =
+  'Warning: `plansentry` is not on your PATH, so the hook will not run and nothing will be checked.\n' +
+  'Install it globally (`npm install -g plansentry`) or add its bin directory to PATH, then restart your agent.\n';
 
 const isOurs = (h: HookEntry) => /^plansentry hook\b/.test(h.command ?? '');
 
@@ -96,6 +115,7 @@ export function installMain(args: string[], uninstall = false): number {
     return 1;
   }
   const { settings, changed } = uninstall ? removeHook(current) : addHook(current, target);
+  if (!uninstall && !onPath('plansentry')) process.stderr.write(NOT_ON_PATH);
   if (!changed) {
     process.stdout.write(uninstall ? `plansentry hook not present in ${path}\n` : `plansentry hook already installed in ${path}\n`);
     return 0;

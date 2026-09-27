@@ -1,6 +1,9 @@
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { delimiter, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { commandFrom, formatDecision, runHook } from '../src/hook/hook.js';
-import { addHook, removeHook } from '../src/install.js';
+import { addHook, onPath, removeHook } from '../src/install.js';
 import { parseExecArgs } from '../src/exec.js';
 
 const input = (command: unknown, extra: Record<string, unknown> = {}) =>
@@ -58,6 +61,15 @@ describe('install', () => {
     const removed = removeHook(once.settings);
     expect(removed.changed).toBe(true);
     expect(removed.settings).toEqual(base);
+  });
+
+  it('checks that the hook command is on PATH', () => {
+    const bin = mkdtempSync(join(tmpdir(), 'plansentry-bin-'));
+    writeFileSync(join(bin, 'plansentry'), '#!/bin/sh\n', { mode: 0o755 });
+    writeFileSync(join(bin, 'not-executable'), '');
+    expect(onPath('plansentry', ['/nonexistent', bin].join(delimiter))).toBe(true);
+    expect(onPath('not-executable', bin)).toBe(false);
+    expect(onPath('plansentry', '/nonexistent')).toBe(false);
   });
 
   it('adds a statusMessage for Codex', () => {
