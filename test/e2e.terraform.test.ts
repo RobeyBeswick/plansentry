@@ -26,6 +26,8 @@ describe.skipIf(!hasTerraform || !existsSync(CLI))('terraform end to end', () =>
     expect(blocked.status).toBe(3);
     const out = blocked.stdout + blocked.stderr;
     expect(out).toContain('terraform_data.db');
+    // Agents often pipe through `tail`; the held items must survive that.
+    expect(out.trimEnd().split('\n').slice(-15).join('\n')).toContain('Held for approval: DANGER replace terraform_data.db');
     const rerun = /plansentry exec --ack ([a-f0-9]{12}) -- terraform apply (\S+\.tfplan)/.exec(out);
     expect(rerun).not.toBeNull();
     const [, digest, planFile] = rerun!;

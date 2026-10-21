@@ -54,13 +54,23 @@ export function gate(verdict: Verdict, opts: GateOptions): GateResult {
   return { ok: false, why: 'needs-approval' };
 }
 
+/**
+ * Every held item in one line. Agents often keep only the tail of the output
+ * (`| tail -15`), which can cut off the full report above.
+ */
+export function heldLine(verdict: Verdict): string {
+  const items = verdict.gating.map((f) => `${f.severity.toUpperCase()} ${f.change} ${f.address}`);
+  return `Held for approval: ${[...items, ...verdict.blockers].join(', ')}`;
+}
+
 export function agentInstructions(rerun: string, verdict: Verdict): string {
   const digest = verdict.digest;
   saveApprovalSummary(digest, shortSummary(verdict));
   return [
     '',
+    heldLine(verdict),
     'Nothing was applied or deployed. The checked plan was saved.',
-    'A human must approve it. Show the user the changes above, and after they agree run:',
+    'A human must approve it. Show the user these changes, and after they agree run:',
     '',
     `  ${rerun}`,
     '',
