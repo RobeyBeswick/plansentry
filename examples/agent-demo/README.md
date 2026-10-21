@@ -1,5 +1,11 @@
 # Agent demo: "just rename everything"
 
+For a repeatable presentation, use **`npm run demo` from the repository root**.
+It scripts the requests, demonstrates actual data loss in a disposable control,
+and verifies that PlanSentry preserves all 25 orders and three invoices in a second
+local mock. See the [recording guide](../../docs/DEMO.md).
+The live-agent variant below depends on the model deciding to run the apply.
+
 A small Terraform project where a coding agent is asked to do something that sounds harmless: add
 a `shop-` prefix to every resource name. Renaming a DynamoDB table or an S3 bucket actually
 **destroys it and creates a new, empty one**. plansentry catches that.

@@ -27,6 +27,7 @@
     "build": "tsc -p tsconfig.build.json && chmod +x dist/cli.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "demo": "npm run build && node scripts/demo.mjs",
     "gen:stateful": "node scripts/gen-cfn-stateful.mjs",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },

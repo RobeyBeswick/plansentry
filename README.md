@@ -55,23 +55,30 @@ That's it. Keep working as usual. When your agent runs an apply or deploy, plans
 
 ## 🎬 Demo
 
-The agent changes something that forces the orders database to be recreated, then runs
-`terraform apply -auto-approve`:
+“Just add `shop-` to the resource names.” The repeatable demo shows what that change
+does to a shop with **25 paid orders and three invoices**:
 
-```text
-plansentry: 1 item(s) need human approval  [digest 949b3c40be6d]
-  DANGER  terraform_data.orders_db  (terraform_data)
-          stateful resource will be REPLACED (destroyed and recreated empty)
-          · because an attribute that cannot be updated in place changed
-          · forced by: triggers_replace
-  Plan: 0 to add, 0 to change, 0 to destroy, 1 to replace.
-Nothing was applied or deployed. The checked plan was saved.
-A human must approve it. Show the user the changes above, and after they agree run:
-  plansentry exec --ack 949b3c40be6d -- terraform apply ~/app/.plansentry/plans/949b3c40be6d.tfplan
+| Same rename, separate disposable shops | Orders left | Invoices left |
+|---|---:|---:|
+| Without plansentry: apply succeeds, resources are replaced | 0 | 0 |
+| With plansentry: replacement blocked before apply | 25 | 3 |
+
+Run it from a checkout with Node.js 20+, Terraform 1.5+ and `uv`:
+
+```sh
+npm ci
+npm run demo            # Enter advances each scene
+npm run demo -- --auto  # uninterrupted rehearsal with assertions
 ```
 
-The agent explains the change to you. If you agree, you approve the prompt and that exact plan is
-applied. Adding a queue, changing tags or resizing an instance would have gone straight through.
+Scripted requests, real Terraform plans and real PlanSentry decisions. Synthetic data
+lives in two local AWS mocks: the unguarded copy really loses its data, and the guarded
+copy is read back to verify every record survived. A safe tag update goes through first.
+The bucket deliberately has `force_destroy` enabled to make the data-loss case visible.
+No model, cloud account or global hook installation is needed.
+
+The first run downloads the demo dependencies. See the [recording guide and spoken
+script](docs/DEMO.md), or the optional [live-agent setup](examples/agent-demo/README.md).
 
 ## 🔎 How It Works
 
