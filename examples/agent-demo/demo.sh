@@ -65,6 +65,24 @@ deploy_baseline() {
   (cd "$DEMO_DIR" && rm -rf .git && git init -q && git add -A && git commit -qm "chore: current infrastructure")
 }
 
+# Point the agent's Bash commands at the mock, whatever AWS_REGION/AWS_PROFILE the user's shell has.
+# A settings `env` block would also reach Claude Code itself (and break it on Bedrock), so the
+# variables go through a SessionStart hook into $CLAUDE_ENV_FILE, which only Bash commands read.
+pin_agent_env() {
+  [[ "$AGENT" == claude ]] || return 0
+  cat >.claude/mock.env <<EOF
+unset AWS_PROFILE
+export AWS_REGION=eu-central-1 AWS_DEFAULT_REGION=eu-central-1
+export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test
+export AWS_ENDPOINT_URL=http://localhost:$PORT AWS_PAGER=
+EOF
+  node -e '
+    const fs = require("fs"), f = ".claude/settings.json";
+    const s = JSON.parse(fs.readFileSync(f, "utf8"));
+    s.hooks.SessionStart = [{ hooks: [{ type: "command", command: "cat \"$CLAUDE_PROJECT_DIR/.claude/mock.env\" >> \"$CLAUDE_ENV_FILE\"" }] }];
+    fs.writeFileSync(f, JSON.stringify(s, null, 2) + "\n");'
+}
+
 case "${1:-}" in
   up)
     need uvx "https://docs.astral.sh/uv/"
@@ -79,6 +97,7 @@ case "${1:-}" in
     terraform init -input=false >/dev/null
     deploy_baseline
     plansentry install "$AGENT" --project
+    pin_agent_env
     echo
     echo "Ready: $DEMO_DIR"
     echo "  cd $DEMO_DIR && $AGENT"
