@@ -79,6 +79,39 @@ For a **90-second cut**, shorten the opening, omit scenes 1, 2 and 5 in the edit
 and keep the unguarded loss, guarded block and final comparison. Keep the
 “scripted requests, local mocks” disclosure.
 
+## Finish the video for publication
+
+- [ ] Capture a 16:9 master at 1920×1080 or higher, with a font that remains
+  readable in the exported video. Use 30 fps for the final export.
+- [ ] Record the narration above, leaving room to read the danger report and
+  both sets of counts. Trim preparation, long waits and the cleanup screen.
+- [ ] Keep **“Scripted requests · real Terraform + PlanSentry · local mocks”**
+  visible in the opening and short cut. Label scene 5 as a replayed hook
+  response; it does not show a live agent UI.
+- [ ] Keep the unguarded result, the real block report, the preserved counts and
+  the `force_destroy` explanation. Do not edit the sequence to imply a
+  production account, a live model or a production incident.
+- [ ] Add captions and review command/resource names by hand. Check the
+  exported audio and terminal text at normal playback size.
+- [ ] Finish the roughly three-minute walkthrough and a 60–90-second launch
+  cut. Export MP4 with H.264 video and AAC audio, plus an SRT caption file for
+  each cut.
+- [ ] Create a thumbnail with **“Just rename the resources.”** and the measured
+  comparison: **Without: 0 orders / 0 invoices; With: 25 orders / 3 invoices**.
+- [ ] Add the public repository and `npm run demo` to the closing card. Add an
+  npm install call to action only after the intended release is available.
+- [ ] Watch the full exports for private paths, usernames, account identifiers,
+  notifications and unrelated windows. Keep raw captures outside Git.
+
+Suggested deliverables: `plansentry-demo.mp4`, `plansentry-demo.srt`,
+`plansentry-demo-short.mp4`, `plansentry-demo-short.srt` and
+`plansentry-demo-thumbnail.png`. These are target filenames, not existing assets.
+Upload the reviewed files with the release, then add a working video link or
+embed to the README and test it while signed out.
+
+Continue with the [publishing checklist](PUBLISHING.md) for versioning, package
+verification, public source, release assets and the launch post.
+
 ## What is executed and verified
 
 - Setup creates a table and bucket in each mock and seeds identical data.

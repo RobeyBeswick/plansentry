@@ -155,6 +155,9 @@ plansentry explain "make deploy"
 
 This project is under the **MIT** license.
 
+Maintainers: follow the [publishing checklist](docs/PUBLISHING.md) for the demo
+video, release verification and public launch.
+
 ---
 
 <p align="center">
