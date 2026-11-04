@@ -1,6 +1,7 @@
 # Publishing checklist
 
-Prepared **2026-10-30**, using the same handoff format as NoMeatProxy.
+Prepared **2026-10-30**, updated **2026-11-04** for the 0.1.1 release, using the same
+handoff format as NoMeatProxy.
 Work through the numbered steps in order: record the demo, prepare and verify
 the release, make the source public, publish the package, then announce it.
 
@@ -10,36 +11,38 @@ registry before release. Do not try to publish `0.1.0` again.
 
 ## Current state
 
-| Area | Verified state on 2026-10-30 |
+| Area | Verified state on 2026-11-04 |
 | --- | --- |
-| Source | `main` at `4096830`; working tree clean before this documentation handoff |
-| npm | `0.1.0` is `latest`, published 2026-09-26; registry `gitHead` is `f8d10af`, nine commits behind this checkout |
-| Package metadata | Both manifests still say `0.1.0`; no `"private": true` flag |
-| GitHub | Private repository; no tags, releases, Actions workflows or runs found |
+| Source | Release branch `chore/public-launch` based on `main` at `3806ee7` |
+| npm | `0.1.0` is `latest`, published 2026-09-26; registry `gitHead` is `f8d10af` |
+| Package metadata | Both manifests say `0.1.1`; Node.js `>=22`; no `"private": true` flag |
+| GitHub | Public repository; no tags or releases yet; CI workflow added and private vulnerability reporting enabled |
 | Video preparation | [Three-minute spoken script and recording guide](DEMO.md), automated rehearsal and optional live-agent fixture exist |
 | Finished video | No tracked video found; recording, editing, captions and upload remain |
-| Release documentation | No `CHANGELOG.md`, `SECURITY.md` or dated live-client compatibility record found |
-| Dependency audit | Six affected packages: two moderate, two high and two critical; production-only audit reports one moderate package (`fast-uri`) |
-| Public-content review | History-aware secret scan, commit-metadata review and media review remain |
+| Release documentation | `CHANGELOG.md`, `SECURITY.md` and `docs/COMPATIBILITY.md` added |
+| Dependency audit | 0 vulnerabilities, including production dependencies |
+| Public-content review | Gitleaks found no leaks; commit metadata reviewed; media review deferred until the video is produced |
 
 The published package predates fixes for hook failures, shell-wrapper detection,
 Terragrunt approval handling, nested stack changes and approval-report visibility,
 as well as the new demo. An installation of `0.1.0` does not validate this checkout.
 
-Local verification for source commit `4096830`:
+Local verification for the `0.1.1` release candidate:
 
 - `npm ci`, typecheck, build and **all 145 tests passed**, including both real
   Terraform end-to-end tests.
-- Packed-package smoke check passed: **30 files, about 41 KiB compressed**,
+- Packed-package smoke check passed: **32 files, about 43 KiB compressed**,
   installed outside the source tree. Version reporting, read-only allow, apply
   redirect, destructive-plan exit `3`, and both agents' project hook
   install/uninstall worked.
 - `npm run demo -- --auto` passed: safe update applied, the unguarded shop lost
   its data, the guarded shop preserved every order and invoice, the approval
   responses matched expectations, and both mocks and temporary shops cleaned up.
-- Runtime: Node.js `22.22.2`, npm `10.9.7`, Terraform `1.5.7`, macOS ARM64.
-- Dependency audit is **not clear**; see step 3. These checks do not establish
-  live agent compatibility or production deployment coverage.
+- Runtime: Node.js `22.23.4`, npm `10.9.9`, Terraform `1.15.8`, uv `0.13.7`,
+  macOS ARM64.
+- Dependency audit is clear. These checks do not establish live agent
+  compatibility or production deployment coverage; see
+  [COMPATIBILITY.md](COMPATIBILITY.md).
 
 Rerun verification after release changes. Local passes do not complete the
 unchecked release tasks below.
@@ -123,30 +126,21 @@ produce nonzero exit codes.
 - [ ] Review targeted dependency updates and the lockfile diff. Some current
   audit fixes propose a Vitest major upgrade; do not apply `npm audit fix
   --force` blindly. Record any remaining finding's applicability and disposition.
-- [ ] Decide the supported Node versions. The package currently advertises
-  `>=20`, but Node 20 reached end of life on 2026-04-30 according to the
-  [official release schedule](https://github.com/nodejs/Release/blob/main/schedule.json).
-  Align `engines`, README, demo prerequisites, Node types and CI with the chosen
-  support policy; use maintained runtimes for launch validation.
-- [ ] Ensure builds happen **before tests** in the release check. The current
-  `prepublishOnly` runs tests before building; Terraform end-to-end tests skip
-  without `dist/cli.js` or Terraform, and can otherwise exercise an old build.
-  Change it to `npm run typecheck && npm run build && npm test`, or use a shared
-  check script with that order.
-- [ ] Add CI for the supported Node/platform combinations, installing Terraform
-  before running the checks. Node 22 and 24 on Linux and macOS are a reasonable
-  initial matrix; broaden advertised support only with evidence.
-- [ ] Make missing end-to-end prerequisites fail the release check instead of
-  accepting a run with those tests skipped.
+- [x] Supported Node versions are now 22 and 24. `engines`, README, demo
+  prerequisites, Node types and CI are aligned with that policy.
+- [x] `npm run check` builds before tests, and `prepublishOnly` uses it.
+- [x] CI covers Node 22 and 24 on Linux and macOS, installing Terraform before
+  running the checks.
+- [x] Missing end-to-end prerequisites fail the release check via
+  `PLANSENTRY_REQUIRE_E2E=1`.
 - [ ] Confirm both manifests have the release version and review
   `git diff -- package.json package-lock.json`.
 
 ## 4. Finish public documentation and content review
 
-- [ ] Add `CHANGELOG.md` covering changes since the published `0.1.0`, including
-  the safety fixes and reproducible demo.
-- [ ] Add `SECURITY.md` with a working private reporting route; configure the
-  route before advertising it.
+- [x] Added `CHANGELOG.md` covering changes since the published `0.1.0`.
+- [x] Added `SECURITY.md`; GitHub private vulnerability reporting is enabled and
+  verified.
 - [ ] Check the README quickstart against the release candidate. Retain the
   restart/trust instructions, the need for the executable on the agent's PATH,
   and the distinction between client permission modes.
@@ -156,11 +150,9 @@ produce nonzero exit codes.
 - [ ] Verify AWS feature claims against current official documentation before
   adding them to the launch copy. Do not present the local mock demonstration
   as a production deployment test.
-- [ ] Run a history-aware secret scan, such as `gitleaks git --redact .` after
-  installing Gitleaks, and inspect the results privately.
-- [ ] Review tracked content and commit metadata for secrets, internal domains,
-  account identifiers, personal paths and customer information. Use synthetic
-  examples such as `123456789012`, `jsmith`, `Acme Corp` and `~/project`.
+- [x] `gitleaks git --redact .` found no leaks across the repository history.
+- [x] Tracked content and commit metadata reviewed; commit authors use GitHub
+  noreply addresses and examples are synthetic.
 - [ ] Review any Actions logs and artifacts created during preparation before
   changing visibility. GitHub makes Actions history and logs public when the
   repository becomes public.
@@ -256,8 +248,7 @@ synthetic replacement plan with `plansentry check` to verify exit `3`; the
 
 ## 7. Make the source public and prepare the final assets
 
-- [ ] After the content review, change GitHub visibility using repository
-  **Settings → General → Danger Zone → Change visibility → Public**.
+- [x] Repository visibility changed to public after the content review.
 - [ ] In a signed-out browser, check the repository, license, README and guides.
   Resolve inaccessible or private links before announcing them.
 - [ ] From the verified, merged commit on `main`, build the final package:

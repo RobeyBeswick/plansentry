@@ -15,7 +15,7 @@ if (args.includes('--help')) {
   npm run demo            Press Enter to advance each scene.
   npm run demo -- --auto   Rehearse without pauses or screen clearing.
 
-Requires Node.js 20+, Terraform 1.5+, and uv. First run downloads Moto and
+Requires Node.js 22+, Terraform 1.5+, and uv. First run downloads Moto and
 the Terraform AWS provider; subsequent runs reuse their download caches.
 After building, use node scripts/demo.mjs for a clean recording start.
 
@@ -128,7 +128,7 @@ function expectExit(result, status, label) {
 
 async function startMock() {
   const child = childProcess('uv', [
-    'run', '--no-project', '--with', 'moto[server]==5.2.2',
+    'run', '--no-project', '--python', '3.12', '--with', 'moto[server]==5.2.2',
     'python', join(checkout, 'scripts', 'demo', 'mock.py'),
   ], root);
   let stderr = '', pending, failure;

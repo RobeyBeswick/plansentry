@@ -15,14 +15,14 @@ are scripted; this is a reproducible guard walkthrough, not an agent recording.
 
 ## Prepare
 
-Requires Node.js 20+, Terraform 1.5+, and `uv` on your PATH.
+Requires Node.js 22+, Terraform 1.5+, and `uv` on your PATH.
 
 ```sh
 npm ci
 npm run demo -- --auto
 ```
 
-The first run downloads Moto 5.2.2 and Terraform's AWS provider 5.100.0.
+The first run downloads Python 3.12, Moto 5.2.2 and Terraform's AWS provider 5.100.0.
 The provider cache is in the checkout's ignored `.demo-cache/terraform/`;
 Python dependencies use uv's cache. Rehearse with network access before the
 presentation. A cached run can still need the package registries for resolution.

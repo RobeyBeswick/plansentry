@@ -7,8 +7,15 @@ import { describe, expect, it } from 'vitest';
 // Real terraform, built-in provider only (no downloads). Needs `npm run build` first.
 const CLI = resolve(__dirname, '../dist/cli.js');
 const hasTerraform = spawnSync('terraform', ['version'], { stdio: 'ignore' }).status === 0;
+const hasBuild = existsSync(CLI);
 
-describe.skipIf(!hasTerraform || !existsSync(CLI))('terraform end to end', () => {
+if (process.env.PLANSENTRY_REQUIRE_E2E === '1' && (!hasTerraform || !hasBuild)) {
+  throw new Error(
+    'Terraform end-to-end prerequisites are missing: build the package and install Terraform before the release check.',
+  );
+}
+
+describe.skipIf(!hasTerraform || !hasBuild)('terraform end to end', () => {
   const dir = mkdtempSync(join(tmpdir(), 'plansentry-e2e-'));
   const env = { ...process.env, PLANSENTRY_NONINTERACTIVE: '1', NO_COLOR: '1', TF_IN_AUTOMATION: '1' };
   const run = (...args: string[]) => spawnSync('node', [CLI, ...args], { cwd: dir, env, encoding: 'utf8', timeout: 120_000 });
