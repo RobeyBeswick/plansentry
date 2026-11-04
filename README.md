@@ -6,7 +6,7 @@
 [![Codex Hook](https://img.shields.io/badge/Codex-Hook-10A37F)](#-2-min-quickstart)
 [![Terraform | OpenTofu | CDK](https://img.shields.io/badge/Terraform_|_OpenTofu_|_CDK-supported-844FBA)](#-what-it-catches)
 [![npm](https://img.shields.io/npm/v/plansentry.svg)](https://www.npmjs.com/package/plansentry)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/RobeyBeswick/plansentry/blob/main/LICENSE)
 
 </div>
 
@@ -38,7 +38,7 @@ ask you to run it yourself.
 
 ## ⚡ 2 min Quickstart
 
-Requires Node.js 20+.
+Requires Node.js 22+.
 
 ```bash
 npm install -g plansentry
@@ -63,7 +63,7 @@ does to a shop with **25 paid orders and three invoices**:
 | Without plansentry: apply succeeds, resources are replaced | 0 | 0 |
 | With plansentry: replacement blocked before apply | 25 | 3 |
 
-Run it from a checkout with Node.js 20+, Terraform 1.5+ and `uv`:
+Run it from a checkout with Node.js 22+, Terraform 1.5+ and `uv`:
 
 ```sh
 npm ci
@@ -78,7 +78,8 @@ The bucket deliberately has `force_destroy` enabled to make the data-loss case v
 No model, cloud account or global hook installation is needed.
 
 The first run downloads the demo dependencies. See the [recording guide and spoken
-script](docs/DEMO.md), or the optional [live-agent setup](examples/agent-demo/README.md).
+script](https://github.com/RobeyBeswick/plansentry/blob/main/docs/DEMO.md), or the optional
+[live-agent setup](https://github.com/RobeyBeswick/plansentry/blob/main/examples/agent-demo/README.md).
 
 ## 🔎 How It Works
 
@@ -155,7 +156,7 @@ plansentry explain "make deploy"
 
 This project is under the **MIT** license.
 
-Maintainers: follow the [publishing checklist](docs/PUBLISHING.md) for the demo
+Maintainers: follow the [publishing checklist](https://github.com/RobeyBeswick/plansentry/blob/main/docs/PUBLISHING.md) for the demo
 video, release verification and public launch.
 
 ---
